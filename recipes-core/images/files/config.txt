@@ -1,0 +1,32 @@
+# =============================================================
+# RPi5 firmware configuration
+# Hardware init — before Linux boots
+# =============================================================
+
+# --- RPi5 specific ------------------------------------------
+# Required for RPi5 — uses RP1 southbridge
+dtparam=pciex1
+
+# --- Disable unused hardware --------------------------------
+dtoverlay=disable-wifi
+dtoverlay=disable-bt
+dtparam=audio=off
+
+# --- UART ---------------------------------------------------
+# Free UART0 from bluetooth, enable serial console
+enable_uart=1
+dtoverlay=uart0
+
+# --- Memory split -------------------------------------------
+# No GPU needed, minimize GPU memory
+gpu_mem=16
+
+# --- Boot config --------------------------------------------
+# Kernel and device tree
+kernel=Image
+auto_initramfs=1
+
+# --- Camera/display -----------------------------------------
+# Explicitly disabled
+camera_auto_detect=0
+display_auto_detect=0
