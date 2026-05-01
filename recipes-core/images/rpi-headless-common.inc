@@ -17,13 +17,13 @@ IMAGE_INSTALL = "\
     systemd-conf \
     systemd-serialgetty \
     \
-	kernel-modules
-	linux-firmware
-	linux-firmware-rpidistro
-	rpi-bootfiles
-	rpi-cmdline
-	rpi-config
-	udev-rules-rpi
+	kernel-modules \
+	linux-firmware \
+    linux-firmware-rpidistro-bcm43456 \
+	rpi-bootfiles \
+	rpi-cmdline \
+	rpi-config \
+	udev-rules-rpi \
     \
     coreutils \
     util-linux \
@@ -40,15 +40,11 @@ IMAGE_INSTALL = "\
     iproute2-ss \
     iproute2-tc \
     iptables \
-    systemd-networkd \
-    systemd-resolved \
     iputils-ping \
     \
     openssh \
     openssh-sshd \
     openssh-sftp-server \
-    \
-    systemd-timesyncd \
     \
     glibc \
     glibc-utils \
