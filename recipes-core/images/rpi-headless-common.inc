@@ -17,11 +17,13 @@ IMAGE_INSTALL = "\
     systemd-conf \
     systemd-serialgetty \
     \
-    kernel-modules \
-    linux-firmware \
-    linux-firmware-rpidistro-bcm43455 \
-    raspberrypi-firmware \
-    raspberrypi-firmware-dt \
+	kernel-modules
+	linux-firmware
+	linux-firmware-rpidistro
+	rpi-bootfiles
+	rpi-cmdline
+	rpi-config
+	udev-rules-rpi
     \
     coreutils \
     util-linux \
