@@ -8,25 +8,21 @@ IMAGE_FEATURES = ""
 
 IMAGE_INSTALL = "\
     \
-    # --- base OS skeleton ---------------------------------------------------\
     base-files \
     base-passwd \
     shadow \
     shadow-base \
     \
-    # --- init & service manager ---------------------------------------------\
     systemd \
     systemd-conf \
     systemd-serialgetty \
     \
-    # --- kernel & firmware --------------------------------------------------\
     kernel-modules \
     linux-firmware \
     linux-firmware-rpidistro-bcm43455 \
     raspberrypi-firmware \
     raspberrypi-firmware-dt \
     \
-    # --- real coreutils -----------------------------------------------------\
     coreutils \
     util-linux \
     util-linux-fsck \
@@ -35,11 +31,9 @@ IMAGE_INSTALL = "\
     e2fsprogs-e2fsck \
     e2fsprogs-resize2fs \
     \
-    # --- shell --------------------------------------------------------------\
     bash \
     bash-completion \
     \
-    # --- networking ---------------------------------------------------------\
     iproute2 \
     iproute2-ss \
     iproute2-tc \
@@ -48,31 +42,25 @@ IMAGE_INSTALL = "\
     systemd-resolved \
     iputils-ping \
     \
-    # --- ssh ----------------------------------------------------------------\
     openssh \
     openssh-sshd \
     openssh-sftp-server \
     \
-    # --- time sync ----------------------------------------------------------\
     systemd-timesyncd \
     \
-    # --- C runtime ----------------------------------------------------------\
     glibc \
     glibc-utils \
     libgcc \
     libstdc++ \
     \
-    # --- Python 3 -----------------------------------------------------------\
     python3 \
     python3-core \
     python3-modules \
     python3-pip \
     \
-    # --- editor -------------------------------------------------------------\
     vim \
     vim-syntax \
     \
-    # --- diagnostics --------------------------------------------------------\
     procps \
     psmisc \
     strace \
@@ -85,15 +73,12 @@ IMAGE_INSTALL = "\
     file \
     which \
     \
-    # --- disk/fs tools ------------------------------------------------------\
     dosfstools \
     parted \
     \
-    # --- rfkill -------------------------------------------------------------\
     rfkill \
     rfkill-disable \
     \
-    # --- timezone / locale --------------------------------------------------\
     tzdata \
 "
 
