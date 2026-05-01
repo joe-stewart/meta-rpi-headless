@@ -20,9 +20,6 @@ IMAGE_INSTALL = "\
 	kernel-modules \
 	linux-firmware \
     linux-firmware-rpidistro-bcm43456 \
-	rpi-bootfiles \
-	rpi-cmdline \
-	rpi-config \
 	udev-rules-rpi \
     \
     coreutils \
