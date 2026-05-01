@@ -21,7 +21,7 @@ SRC_URI += "\
     file://config.txt \
 "
 
-do_install_append() {
+do_install:append() {
     install -d ${IMAGE_ROOTFS}/etc/systemd/network/
     install -m 0644 ${WORKDIR}/10-eth0.network \
         ${IMAGE_ROOTFS}/etc/systemd/network/
