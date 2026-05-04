@@ -1,6 +1,6 @@
 # =============================================================================
 # rpi-headless-common.inc — shared package list for all RPi headless builds
-# Included by rpi5-base-image.bb and eventually rpi4-base-image.bb
+# Included by rpi-base-image.bb
 # =============================================================================
 
 # No image features — we don't use the feature/package-group abstraction
@@ -12,6 +12,7 @@ IMAGE_INSTALL = "\
     base-passwd \
     shadow \
     shadow-base \
+    sudo \
     \
     systemd \
     systemd-conf \
@@ -19,7 +20,6 @@ IMAGE_INSTALL = "\
     \
 	kernel-modules \
 	linux-firmware \
-    linux-firmware-rpidistro-bcm43456 \
 	udev-rules-rpi \
     \
     coreutils \
@@ -76,6 +76,7 @@ IMAGE_INSTALL = "\
     \
     tzdata \
 "
+MACHINE_HOSTNAME = "serial"
 
 # --- Filesystem --------------------------------------------------------------
 IMAGE_ROOTFS_SIZE = "524288"
@@ -84,7 +85,11 @@ IMAGE_FSTYPES = "ext4 rpi-sdimg"
 
 # --- Root access -------------------------------------------------------------
 inherit extrausers
-EXTRA_USERS_PARAMS = "usermod -P '' root;"
+EXTRA_USERS_PARAMS = "\
+    usermod -L root; \
+    useradd -m -s /bin/bash -G sudo joe; \
+    usermod -p '$6$IaIxhJIE8q1sh75/$ReloBhWagPV/O10eZI78nSO7qQtS9jsYiyI.lZ7.7n6N1ryrG08ee7yCU58v4/Pr5.gIWW5xgGiUcHWUITfJA1/' joe; \
+"
 
 # --- systemd units to enable -------------------------------------------------
 SYSTEMD_AUTO_ENABLE:pn-systemd-networkd = "enable"
