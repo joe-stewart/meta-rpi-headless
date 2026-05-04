@@ -13,6 +13,7 @@ IMAGE_INSTALL = "\
     shadow \
     shadow-base \
     sudo \
+    sudo-config \
     \
     systemd \
     systemd-conf \
@@ -29,6 +30,7 @@ IMAGE_INSTALL = "\
     e2fsprogs \
     e2fsprogs-e2fsck \
     e2fsprogs-resize2fs \
+    ncurses-terminfo-base \
     \
     bash \
     bash-completion \
@@ -88,7 +90,7 @@ inherit extrausers
 EXTRA_USERS_PARAMS = "\
     usermod -L root; \
     useradd -m -s /bin/bash -G sudo joe; \
-    usermod -p '$6$IaIxhJIE8q1sh75/$ReloBhWagPV/O10eZI78nSO7qQtS9jsYiyI.lZ7.7n6N1ryrG08ee7yCU58v4/Pr5.gIWW5xgGiUcHWUITfJA1/' joe; \
+    usermod -p '\$6\$g0sD6J4nAB9Zvzpj\$DEbLp35iGebt7jOcdhgZnMqxZpYYgNjluWVzKP10t7sEYRvYLVvjGtP64IbTQQZSt4Ed.QaT3hYmmN8u8GkME.' joe; \
 "
 
 # --- systemd units to enable -------------------------------------------------
