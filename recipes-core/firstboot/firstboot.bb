@@ -33,6 +33,8 @@ do_install() {
     install -m 0644 ${WORKDIR}/firstboot.service ${D}${systemd_system_unitdir}/firstboot.service
 }
 
+RDEPENDS:${PN} = "bash"
+
 FILES:${PN} = "\
     ${sbindir}/firstboot.sh \
     ${sysconfdir}/firstboot.ini.template \
