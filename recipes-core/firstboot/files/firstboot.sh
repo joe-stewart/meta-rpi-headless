@@ -41,9 +41,13 @@ systemctl mask serial-getty@ttyS0.service
 # =============================================================================
 
 if [ ! -f "$INI" ]; then
-    $LOG "No /firstboot.ini found — skipping user config. See /etc/firstboot.ini.template"
-    touch "$STAMP"
-    exit 0
+    $LOG "FIRSTBOOT ERROR: No /firstboot.ini found — locking root and shutting down"
+    $LOG "Mount the card, create /firstboot.ini from /etc/firstboot.ini.template and reboot"
+    passwd -l root
+    [ -w /dev/ttyS0 ] && echo -e "\n\n*** FIRSTBOOT ERROR ***\nNo /firstboot.ini found.\nRoot locked. System shutting down.\nMount card, create /firstboot.ini from /etc/firstboot.ini.template and reboot.\n***\n" > /dev/ttyS0
+    sleep 5
+    systemctl poweroff
+    exit 1
 fi
 
 # Parse ini helper
