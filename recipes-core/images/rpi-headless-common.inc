@@ -73,25 +73,13 @@ IMAGE_INSTALL = "\
     dosfstools \
     parted \
     \
-    rfkill \
-    rfkill-disable \
-    \
     tzdata \
 "
-MACHINE_HOSTNAME = "serial"
 
 # --- Filesystem --------------------------------------------------------------
 IMAGE_ROOTFS_SIZE = "524288"
 IMAGE_ROOTFS_EXTRA_SPACE = "524288"
 IMAGE_FSTYPES = "ext4 rpi-sdimg"
-
-# --- Root access -------------------------------------------------------------
-inherit extrausers
-EXTRA_USERS_PARAMS = "\
-    usermod -L root; \
-    useradd -m -s /bin/bash -G sudo joe; \
-    usermod -p '\$6\$g0sD6J4nAB9Zvzpj\$DEbLp35iGebt7jOcdhgZnMqxZpYYgNjluWVzKP10t7sEYRvYLVvjGtP64IbTQQZSt4Ed.QaT3hYmmN8u8GkME.' joe; \
-"
 
 # --- systemd units to enable -------------------------------------------------
 SYSTEMD_AUTO_ENABLE:pn-systemd-networkd = "enable"
