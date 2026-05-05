@@ -14,6 +14,7 @@ IMAGE_INSTALL = "\
     shadow-base \
     sudo \
     sudo-config \
+    firstboot \
     \
     systemd \
     systemd-conf \

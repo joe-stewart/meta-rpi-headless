@@ -1,0 +1,22 @@
+# =============================================================================
+# firstboot.ini — RPi Headless first boot configuration
+# Place this file on the boot partition before first boot.
+# Delete entries you don't need or leave them commented out.
+# =============================================================================
+
+[user]
+# username=joe
+# password=changeme
+# uid=1000
+
+[ssh]
+# authorized_keys=ssh-ed25519 AAAA...
+
+[hostname]
+# hostname=rpiheadless
+
+[network]
+# DHCP is default, leave blank unless you need static
+# static_ip=
+# gateway=
+# dns=

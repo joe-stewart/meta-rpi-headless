@@ -1,0 +1,12 @@
+[Unit]
+Description=First boot configuration
+After=network.target
+ConditionPathExists=!/etc/firstboot.done
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/firstboot.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
