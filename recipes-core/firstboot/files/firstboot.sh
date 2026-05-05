@@ -45,7 +45,8 @@ if [ ! -f "$INI" ]; then
     $LOG "Mount the card, create /firstboot.ini from /etc/firstboot.ini.template and reboot"
     passwd -l root
     [ -w /dev/ttyS0 ] && echo -e "\n\n*** FIRSTBOOT ERROR ***\nNo /firstboot.ini found.\nRoot locked. System shutting down.\nMount card, create /firstboot.ini from /etc/firstboot.ini.template and reboot.\n***\n" > /dev/ttyS0
-    sleep 5
+    journalctl --sync
+    sleep 2
     systemctl poweroff
     exit 1
 fi
