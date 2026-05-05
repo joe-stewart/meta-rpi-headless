@@ -66,13 +66,17 @@ PASSWORD=$(get_value user password)
 UID_VAL=$(get_value user uid)
 
 if [ -n "$USERNAME" ]; then
-    $LOG "Creating user $USERNAME"
-    UID_OPT=""
-    [ -n "$UID_VAL" ] && UID_OPT="-u $UID_VAL"
-    useradd -m -s /bin/bash $UID_OPT -G sudo "$USERNAME"
-    if [ -n "$PASSWORD" ]; then
-        echo "$USERNAME:$PASSWORD" | chpasswd
-        $LOG "Password set for $USERNAME"
+    if id "$USERNAME" &>/dev/null; then
+        $LOG "User $USERNAME already exists — skipping creation"
+    else
+        $LOG "Creating user $USERNAME"
+        UID_OPT=""
+        [ -n "$UID_VAL" ] && UID_OPT="-u $UID_VAL"
+        useradd -m -s /bin/bash $UID_OPT -G sudo "$USERNAME"
+        if [ -n "$PASSWORD" ]; then
+            echo "$USERNAME:$PASSWORD" | chpasswd
+            $LOG "Password set for $USERNAME"
+        fi
     fi
 fi
 
