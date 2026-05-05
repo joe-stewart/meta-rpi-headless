@@ -1,7 +1,9 @@
 #!/bin/bash
 # =============================================================================
-# firstboot.sh — RPi Headless first boot configuration script
-# Runs once on first boot, processes firstboot.ini from boot partition
+# firstboot.sh — RPi Headless first boot configuration
+# Runs once on first boot.
+# Phase 1: system defaults — applied unconditionally
+# Phase 2: user config — applied from /firstboot.ini if present
 # =============================================================================
 
 STAMP=/etc/firstboot.done
@@ -13,9 +15,33 @@ LOG="logger -t firstboot"
 
 $LOG "Starting first boot configuration"
 
-# No ini file — log and exit cleanly
+# =============================================================================
+# PHASE 1 — System defaults
+# Applied once unconditionally. If you modify these manually later,
+# firstboot will not overwrite them — you own your changes.
+# =============================================================================
+
+# --- TERM and PATH -----------------------------------------------------------
+$LOG "Setting TERM and PATH defaults"
+cat > /etc/profile.d/rpi-headless.sh << 'EOF'
+export TERM=xterm-256color
+export PATH=$PATH:/usr/sbin
+EOF
+chmod 644 /etc/profile.d/rpi-headless.sh
+
+# --- Mask ttyS0 --------------------------------------------------------------
+$LOG "Masking serial-getty@ttyS0.service"
+systemctl mask serial-getty@ttyS0.service
+
+# =============================================================================
+# PHASE 2 — User configuration
+# Reads /firstboot.ini if present. File is deleted after processing.
+# To reconfigure: copy /etc/firstboot.ini.template to /firstboot.ini,
+# edit it, delete /etc/firstboot.done and reboot.
+# =============================================================================
+
 if [ ! -f "$INI" ]; then
-    $LOG "No /firstboot.ini found — skipping. See /etc/firstboot.ini.template to configure"
+    $LOG "No /firstboot.ini found — skipping user config. See /etc/firstboot.ini.template"
     touch "$STAMP"
     exit 0
 fi
@@ -75,7 +101,7 @@ if [ -n "$USERNAME" ]; then
 fi
 
 # --- Cleanup -----------------------------------------------------------------
-$LOG "Removing firstboot.ini"
+$LOG "Removing /firstboot.ini"
 rm -f "$INI"
 
 $LOG "First boot configuration complete"
