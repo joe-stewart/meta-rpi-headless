@@ -1,7 +1,10 @@
 # =============================================================================
-# firstboot.bb — First boot configuration service
-# Processes /firstboot.ini on first boot, then removes it
+# firstboot.bb — Installs the firstboot service into the image.
+# firstboot runs once on first boot to configure the system from /firstboot.ini.
+# Installs: firstboot.sh, firstboot.service, firstboot.ini.template
+# See firstboot.sh for full two-phase configuration logic.
 # =============================================================================
+
 SUMMARY = "First boot configuration service"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"

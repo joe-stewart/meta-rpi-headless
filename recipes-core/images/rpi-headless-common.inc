@@ -1,6 +1,8 @@
 # =============================================================================
-# rpi-headless-common.inc — shared package list for all RPi headless builds
-# Included by rpi-base-image.bb
+# rpi-headless-common.inc — Shared package list included by rpi-base-image.bb.
+# Defines every package explicitly — no packagegroup abstraction.
+# No busybox — replaced by coreutils, util-linux, bash and standard tools.
+# User creation and hostname are handled by firstboot at runtime, not here.
 # =============================================================================
 
 # No image features — we don't use the feature/package-group abstraction

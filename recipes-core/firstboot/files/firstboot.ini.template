@@ -1,7 +1,9 @@
 # =============================================================================
-# firstboot.ini — RPi Headless first boot configuration
-# Place this file on the boot partition before first boot.
-# Delete entries you don't need or leave them commented out.
+# firstboot.ini.template — Template for first boot configuration.
+# Copy to /firstboot.ini, fill in your details, and reboot.
+# Processed once by firstboot.sh, deleted after. Root is locked on completion.
+# To reconfigure: copy template to /firstboot.ini, delete /etc/firstboot.done,
+# and  reboot.
 # =============================================================================
 
 [user]
