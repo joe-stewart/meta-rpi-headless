@@ -1,0 +1,458 @@
+./combined.txt
+./conf/layer.conf
+./conf/distro/rpi-headless.conf
+./recipes-bsp/bootfiles/rpi-config_git.bbappend
+./recipes-core/sudo/sudo-config.bb
+./recipes-core/images/rpi-base-image.bb
+./recipes-core/images/rpi-headless-common.inc
+./recipes-core/firstboot/files/firstboot.sh
+./recipes-core/firstboot/files/firstboot.service
+./recipes-core/firstboot/files/firstboot.ini.template
+./recipes-core/firstboot/firstboot.bb
+# =============================================================================
+# layer.conf — Registers meta-custom with Yocto's layer system.
+# Yocto requires this file to recognise meta-custom as a valid layer.
+# Without it bitbake will not find any recipes in this directory.
+# Priority 6 overrides meta-raspberrypi (priority 5) where needed.
+# =============================================================================
+
+BBPATH .= ":${LAYERDIR}"
+
+BBFILES += "${LAYERDIR}/recipes-*/*/*.bb \
+             ${LAYERDIR}/recipes-*/*/*.bbappend"
+
+BBFILE_COLLECTIONS += "meta-custom"
+BBFILE_PATTERN_meta-custom = "^${LAYERDIR}/"
+BBFILE_PRIORITY_meta-custom = "6"
+
+LAYERDEPENDS_meta-custom = "core"
+LAYERSERIES_COMPAT_meta-custom = "scarthgap"
+# =============================================================================
+# rpi-headless.conf — Defines the rpi-headless distro.
+# Sets every build knob explicitly — no inherited base distro.
+# LFS philosophy: nothing implicit, nothing assumed.
+# Covers toolchain, features, package exclusions, RPi config.txt defaults,
+# and shared cache locations for the Gentoo build machine.
+# =============================================================================
+
+DISTRO = "rpi-headless"
+DISTRO_NAME = "RPi Headless"
+DISTRO_VERSION = "1.0"
+DISTRO_CODENAME = "clean"
+
+# --- Init system -------------------------------------------------------------
+INIT_MANAGER = "systemd"
+DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"
+DISTRO_FEATURES_BACKFILL_CONSIDERED += "pulseaudio"
+
+# --- Distro features ---------------------------------------------------------
+DISTRO_FEATURES = " \
+    ipv4 \
+    ipv6 \
+    largefile \
+    systemd \
+    ext2 \
+    seccomp \
+    argp \
+    xattr \
+"
+
+# --- Toolchain ---------------------------------------------------------------
+TCMODE = "default"
+TCLIBC = "glibc"
+DEFAULTTUNE ?= "cortexa76"
+
+# --- Optimization ------------------------------------------------------------
+FULL_OPTIMIZATION = "-O2 -pipe"
+DEBUG_BUILD = "0"
+INHIBIT_PACKAGE_STRIP = "0"
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+
+# --- Preferred providers -----------------------------------------------------
+PREFERRED_PROVIDER_virtual/kernel ?= "linux-raspberrypi"
+PREFERRED_PROVIDER_virtual/bootloader ?= "rpi-u-boot-scr"
+PREFERRED_PROVIDER_virtual/ssh ?= "openssh"
+PREFERRED_PROVIDER_virtual/sh ?= "bash"
+
+# --- No busybox --------------------------------------------------------------
+PACKAGE_EXCLUDE = "busybox"
+
+# --- Locale / timezone -------------------------------------------------------
+IMAGE_LINGUAS = "en-us"
+GLIBC_GENERATE_LOCALES = "en_US.UTF-8"
+DEFAULT_TIMEZONE = "America/Los_Angeles"
+
+# --- Package management ------------------------------------------------------
+PACKAGE_CLASSES = "package_rpm"
+
+# --- Shared cache ------------------------------------------------------------
+DL_DIR ?= "${HOME}/Development/shared/downloads"
+SSTATE_DIR ?= "${HOME}/Development/shared/sstate-cache"
+
+# --- Reproducible builds -----------------------------------------------------
+BB_SIGNATURE_HANDLER = "OEEquivHash"
+BB_HASHSERVE = "auto"
+
+# Boot partition size in KiB — needs room for kernel, dtbs, overlays
+BOOT_SPACE = "131072"
+
+# --- RPi config.txt ----------------------------------------------------------
+DISABLE_SPLASH = "1"
+DISABLE_RPI_BOOT_LOGO = "1"
+CMDLINE_DEBUG = "console=tty1"
+ENABLE_UART = "1"
+HDMI_FORCE_HOTPLUG = "1"
+DISABLE_VC4GRAPHICS = "1"
+
+RPI_EXTRA_CONFIG = "\
+arm_64bit=1\n\
+dtoverlay=disable-wifi\n\
+dtoverlay=disable-bt\n\
+hdmi_safe=1\n\
+disable_fw_kms_setup=1\n\
+auto_initramfs=0\n\
+dtparam=act_led_trigger=mmc0\n\
+"
+# =============================================================================
+# rpi-config_git.bbappend — Strips comments and blank lines from config.txt
+# at deploy time. The RPi bootloader has a file size limit that commented-out
+# lines can exceed.
+# Workaround: https://github.com/raspberrypi/firmware/issues/1948
+# =============================================================================
+
+do_deploy:append() {
+    sed -i '/^#/d' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+    sed -i '/^$/d' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+}
+# =============================================================================
+# sudo-config.bb — Grants the sudo group full root access via sudoers.
+# Any user added to the sudo group can run commands as root with a password.
+# firstboot adds the new user to the sudo group during first boot setup.
+# Note: root is locked after firstboot — sudo is the only path to root access.
+# =============================================================================
+
+SUMMARY = "sudoers configuration granting sudo group full access"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+S = "${WORKDIR}"
+
+ALLOW_EMPTY:${PN} = "1"
+
+pkg_postinst:${PN}() {
+    echo "%sudo ALL=(ALL:ALL) ALL" > $D${sysconfdir}/sudoers.d/sudo-group
+    chmod 0440 $D${sysconfdir}/sudoers.d/sudo-group
+}
+
+RDEPENDS:${PN} = "sudo"
+# =============================================================================
+# rpi-base-image.bb — Top level image recipe for RPi headless builds.
+# Pulls in rpi-headless-common.inc for the shared package list, then adds
+# any board-specific packages. Currently includes bcm43456 wifi firmware
+# for RPi4 compatibility. CM4 ignores it — no wifi hardware present.
+# Build with: bitbake rpi-base-image
+# =============================================================================
+
+SUMMARY = "Minimal headless RPi image — every package explicit"
+LICENSE = "MIT"
+
+inherit image
+
+require rpi-headless-common.inc
+
+deltask do_populate_sdk
+deltask do_populate_sdk_ext
+
+# --- RPi specific packages --------------------------------------------------
+IMAGE_INSTALL += "\
+    linux-firmware-rpidistro-bcm43456 \
+"
+# =============================================================================
+# rpi-headless-common.inc — Shared package list included by rpi-base-image.bb.
+# Defines every package explicitly — no packagegroup abstraction.
+# No busybox — replaced by coreutils, util-linux, bash and standard tools.
+# User creation and hostname are handled by firstboot at runtime, not here.
+# =============================================================================
+
+# No image features — we don't use the feature/package-group abstraction
+IMAGE_FEATURES = ""
+
+IMAGE_INSTALL = "\
+    \
+    base-files \
+    base-passwd \
+    shadow \
+    shadow-base \
+    sudo \
+    sudo-config \
+    firstboot \
+    \
+    systemd \
+    systemd-conf \
+    systemd-serialgetty \
+    \
+	kernel-modules \
+	linux-firmware \
+	udev-rules-rpi \
+    \
+    coreutils \
+    util-linux \
+    util-linux-fsck \
+    util-linux-mount \
+    e2fsprogs \
+    e2fsprogs-e2fsck \
+    e2fsprogs-resize2fs \
+    ncurses-terminfo-base \
+    \
+    bash \
+    bash-completion \
+    \
+    iproute2 \
+    iproute2-ss \
+    iproute2-tc \
+    iptables \
+    iputils-ping \
+    \
+    openssh \
+    openssh-sshd \
+    openssh-sftp-server \
+    \
+    glibc \
+    glibc-utils \
+    libgcc \
+    libstdc++ \
+    \
+    python3 \
+    python3-core \
+    python3-modules \
+    python3-pip \
+    \
+    vim \
+    vim-syntax \
+    \
+    procps \
+    psmisc \
+    strace \
+    less \
+    grep \
+    sed \
+    gawk \
+    findutils \
+    diffutils \
+    file \
+    which \
+    \
+    dosfstools \
+    parted \
+    \
+    tzdata \
+"
+
+# --- Filesystem --------------------------------------------------------------
+IMAGE_ROOTFS_SIZE = "524288"
+IMAGE_ROOTFS_EXTRA_SPACE = "524288"
+IMAGE_FSTYPES = "ext4 rpi-sdimg"
+
+# --- systemd units to enable -------------------------------------------------
+SYSTEMD_AUTO_ENABLE:pn-systemd-networkd = "enable"
+SYSTEMD_AUTO_ENABLE:pn-systemd-resolved = "enable"
+SYSTEMD_AUTO_ENABLE:pn-openssh = "enable"
+#!/bin/bash
+# =============================================================================
+# firstboot.sh — RPi Headless first boot configuration
+# Runs once on first boot.
+# Phase 1: system defaults — applied unconditionally
+# Phase 2: user config — applied from /firstboot.ini if present
+# =============================================================================
+
+STAMP=/etc/firstboot.done
+INI=/firstboot.ini
+LOG="logger -t firstboot"
+
+# Already ran, exit immediately
+[ -f "$STAMP" ] && exit 0
+
+$LOG "Starting first boot configuration"
+
+# =============================================================================
+# PHASE 1 — System defaults
+# Applied once unconditionally. If you modify these manually later,
+# firstboot will not overwrite them — you own your changes.
+# =============================================================================
+
+# --- TERM and PATH -----------------------------------------------------------
+$LOG "Setting TERM and PATH defaults"
+cat > /etc/profile.d/rpi-headless.sh << 'EOF'
+export TERM=xterm-256color
+export PATH=$PATH:/usr/sbin
+EOF
+chmod 644 /etc/profile.d/rpi-headless.sh
+
+# --- Mask ttyS0 --------------------------------------------------------------
+$LOG "Masking serial-getty@ttyS0.service"
+systemctl mask serial-getty@ttyS0.service
+
+# =============================================================================
+# PHASE 2 — User configuration
+# Reads /firstboot.ini if present. File is deleted after processing.
+# To reconfigure: copy /etc/firstboot.ini.template to /firstboot.ini,
+# edit it, delete /etc/firstboot.done and reboot.
+# =============================================================================
+
+if [ ! -f "$INI" ]; then
+    $LOG "FIRSTBOOT ERROR: No /firstboot.ini found — locking root and shutting down"
+    $LOG "Mount the card, create /firstboot.ini from /etc/firstboot.ini.template and reboot"
+    passwd -l root
+    [ -w /dev/ttyS0 ] && echo -e "\n\n*** FIRSTBOOT ERROR ***\nNo /firstboot.ini found.\nRoot locked. System shutting down.\nMount card, create /firstboot.ini from /etc/firstboot.ini.template and reboot.\n***\n" > /dev/ttyS0
+    journalctl --sync
+    sleep 2
+    systemctl poweroff
+    exit 1
+fi
+
+# Parse ini helper
+get_value() {
+    local section=$1
+    local key=$2
+    sed -n "/^\[$section\]/,/^\[/p" "$INI" \
+        | grep "^${key}=" \
+        | cut -d= -f2- \
+        | tr -d '[:space:]'
+}
+
+# --- User --------------------------------------------------------------------
+USERNAME=$(get_value user username)
+PASSWORD=$(get_value user password)
+UID_VAL=$(get_value user uid)
+
+if [ -n "$USERNAME" ]; then
+    if id "$USERNAME" &>/dev/null; then
+        $LOG "User $USERNAME already exists — skipping creation"
+    else
+        $LOG "Creating user $USERNAME"
+        UID_OPT=""
+        [ -n "$UID_VAL" ] && UID_OPT="-u $UID_VAL"
+        useradd -m -s /bin/bash $UID_OPT -G sudo "$USERNAME"
+        if [ -n "$PASSWORD" ]; then
+            echo "$USERNAME:$PASSWORD" | chpasswd
+            $LOG "Password set for $USERNAME"
+        fi
+    fi
+fi
+
+# --- SSH ---------------------------------------------------------------------
+AUTHORIZED_KEYS=$(get_value ssh authorized_keys)
+
+if [ -n "$AUTHORIZED_KEYS" ] && [ -n "$USERNAME" ]; then
+    $LOG "Installing authorized_keys for $USERNAME"
+    SSH_DIR=/home/$USERNAME/.ssh
+    mkdir -p "$SSH_DIR"
+    echo "$AUTHORIZED_KEYS" > "$SSH_DIR/authorized_keys"
+    chown -R "$USERNAME:$USERNAME" "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
+    chmod 600 "$SSH_DIR/authorized_keys"
+fi
+
+# --- Hostname ----------------------------------------------------------------
+HOSTNAME=$(get_value hostname hostname)
+
+if [ -n "$HOSTNAME" ]; then
+    $LOG "Setting hostname to $HOSTNAME"
+    echo "$HOSTNAME" > /etc/hostname
+    hostnamectl set-hostname "$HOSTNAME"
+fi
+
+# --- Root --------------------------------------------------------------------
+if [ -n "$USERNAME" ]; then
+    $LOG "Locking root account"
+    passwd -l root
+fi
+
+# --- Cleanup -----------------------------------------------------------------
+$LOG "Removing /firstboot.ini"
+rm -f "$INI"
+
+$LOG "First boot configuration complete"
+touch "$STAMP"
+exit 0
+[Unit]
+Description=First boot configuration
+After=network.target
+ConditionPathExists=!/etc/firstboot.done
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/firstboot.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+# =============================================================================
+# firstboot.ini.template — Template for first boot configuration.
+# Copy to /firstboot.ini, fill in your details, and reboot.
+# Processed once by firstboot.sh, deleted after. Root is locked on completion.
+# To reconfigure: copy template to /firstboot.ini, delete /etc/firstboot.done,
+# and  reboot.
+# =============================================================================
+
+[user]
+# username=joe
+# password=changeme
+# uid=1000
+
+[ssh]
+# authorized_keys=ssh-ed25519 AAAA...
+
+[hostname]
+# hostname=rpiheadless
+
+[network]
+# DHCP is default, leave blank unless you need static
+# static_ip=
+# gateway=
+# dns=
+# =============================================================================
+# firstboot.bb — Installs the firstboot service into the image.
+# firstboot runs once on first boot to configure the system from /firstboot.ini.
+# Installs: firstboot.sh, firstboot.service, firstboot.ini.template
+# See firstboot.sh for full two-phase configuration logic.
+# =============================================================================
+
+SUMMARY = "First boot configuration service"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+SRC_URI = "\
+    file://firstboot.sh \
+    file://firstboot.ini.template \
+    file://firstboot.service \
+"
+
+S = "${WORKDIR}"
+
+inherit systemd
+
+SYSTEMD_SERVICE:${PN} = "firstboot.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
+
+do_install() {
+    # Install script
+    install -d ${D}${sbindir}
+    install -m 0755 ${WORKDIR}/firstboot.sh ${D}${sbindir}/firstboot.sh
+
+    # Install template
+    install -d ${D}${sysconfdir}
+    install -m 0644 ${WORKDIR}/firstboot.ini.template ${D}${sysconfdir}/firstboot.ini.template
+
+    # Install systemd unit
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${WORKDIR}/firstboot.service ${D}${systemd_system_unitdir}/firstboot.service
+}
+
+RDEPENDS:${PN} = "bash"
+
+FILES:${PN} = "\
+    ${sbindir}/firstboot.sh \
+    ${sysconfdir}/firstboot.ini.template \
+    ${systemd_system_unitdir}/firstboot.service \
+"
