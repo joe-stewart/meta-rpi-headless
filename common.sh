@@ -69,7 +69,7 @@ BBLAYERS ?= " \\
     ${base}/meta-openembedded/meta-python \\
     ${base}/meta-openembedded/meta-networking \\
     ${base}/meta-raspberrypi \\
-    ${base}/meta-custom \\
+    ${SCRIPT_DIR} \\
 "
 EOF
 }
