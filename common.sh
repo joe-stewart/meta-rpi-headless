@@ -7,7 +7,7 @@
 BRANCH="scarthgap"
 MACHINE="raspberrypi4-64"
 DISTRO="rpi-headless"
-META_CUSTOM_REPO="git@//github.com/joe-stewart/meta-rpi-headless"
+META_CUSTOM_REPO="git@//github.com:joe-stewart/meta-rpi-headless"
 
 # =============================================================================
 # clone_or_skip <name> <url> <base>
