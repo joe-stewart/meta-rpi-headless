@@ -1,0 +1,11 @@
+# Editor
+*.swp
+*.swo
+.helix/
+
+# Yocto — should not be in a layer repo but just in case
+tmp-glibc/
+sstate-cache/
+downloads/
+*.pyc
+__pycache__/
