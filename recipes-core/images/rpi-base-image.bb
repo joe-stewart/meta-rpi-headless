@@ -20,3 +20,7 @@ deltask do_populate_sdk_ext
 IMAGE_INSTALL += "\
     linux-firmware-rpidistro-bcm43456 \
 "
+
+IMAGE_FSTYPES = "ext4"
+IMAGE_FSTYPES:append:rpi = " rpi-sdimg"
+IMAGE_INSTALL:append:rpi = " udev-rules-rpi"
