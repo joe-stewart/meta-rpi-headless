@@ -1,8 +1,8 @@
 #!/bin/bash
 # =============================================================================
 # setup.sh — rpi-headless environment setup
-# Clones poky, meta-openembedded, meta-raspberrypi, and meta-custom,
-# creates shared cache directories, and seeds build-cm4 with
+# Clones poky, meta-openembedded, and meta-raspberrypi into the Yocto workspace
+# Creates shared cache directories, and seeds build-cm4 with
 # populated bblayers.conf and local.conf.
 #
 # Usage: bash setup.sh
@@ -85,7 +85,7 @@ echo "Directory layout:"
 echo "  ${BASE}/poky"
 echo "  ${BASE}/meta-openembedded"
 echo "  ${BASE}/meta-raspberrypi"
-echo "  ${BASE}/meta-custom"
+echo "  ${SCRIPT_DIR}"
 echo "  ${BASE}/shared/downloads"
 echo "  ${BASE}/shared/sstate-cache"
 echo "  ${BASE}/build-cm4/conf/"

@@ -126,7 +126,7 @@ check_layers() {
         fi
     done
     if [ ! -d "${SCRIPT_DIR}/.git" ]; then
-        echo "  ERROR: meta-custom layer not found at ${SCRIPT_DIR}"
+        echo "  ERROR: custom layer not found at ${SCRIPT_DIR}"
         missing=1
     fi
 
