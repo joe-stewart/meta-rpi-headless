@@ -38,7 +38,7 @@ clone_all_layers() {
 
     echo "Cloning layers (branch: ${BRANCH})..."
     echo ""
-    clone_or_skip "poky"              "git://git.yoctoproject.org/poky"              "${base}"
+    clone_or_skip "poky"              "https://git.yoctoproject.org/poky"              "${base}"
     clone_or_skip "meta-openembedded" "https://github.com/openembedded/meta-openembedded" "${base}"
     clone_or_skip "meta-raspberrypi"  "https://github.com/agherzan/meta-raspberrypi" "${base}"
     clone_or_skip "meta-custom"       "${META_CUSTOM_REPO}"                           "${base}"
