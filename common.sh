@@ -119,12 +119,16 @@ check_layers() {
     local base=$1
     local missing=0
 
-    for layer in poky meta-openembedded meta-raspberrypi meta-custom; do
+    for layer in poky meta-openembedded meta-raspberrypi; do
         if [ ! -d "${base}/${layer}/.git" ]; then
             echo "  ERROR: ${layer} not found at ${base}/${layer}"
             missing=1
         fi
     done
+    if [ ! -d "${SCRIPT_DIR}/.git" ]; then
+        echo "  ERROR: meta-custom layer not found at ${SCRIPT_DIR}"
+        missing=1
+    fi
 
     return $missing
 }
