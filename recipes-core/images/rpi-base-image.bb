@@ -25,6 +25,6 @@ IMAGE_FSTYPES = "ext4"
 IMAGE_FSTYPES:append:rpi = " rpi-sdimg"
 IMAGE_INSTALL:append:rpi = " udev-rules-rpi"
 
-do_image_complete:append() {
+do_build:append() {
     bbwarn "Image built. Edit firstboot.ini and copy to the root partition before first boot."
 }
