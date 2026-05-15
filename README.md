@@ -11,6 +11,37 @@ Tested on scarthgap.
 
 ---
 
+## Getting started
+
+Clone the repo and run the setup script:
+
+```bash
+git clone git@github.com:joe-stewart/meta-rpi-headless meta-custom
+cd meta-custom
+bash setup.sh
+```
+
+The script clones poky, meta-openembedded, and meta-raspberrypi into the Yocto
+workspace, creates `build-cm4/conf/` with populated `bblayers.conf` and
+`local.conf`, and generates a `firstboot.ini` template ready to edit.
+
+**Scripts included:**
+
+`setup.sh` — environment setup for a new build. Prompts for a base directory,
+clones all required layers, creates the build directory, and generates
+`firstboot.ini`. Safe to rerun — skips anything already present.
+
+`test.sh` — clean build test. Uses an isolated `build-test` directory and a
+separate sstate cache (`shared/sstate-test`) so the build reflects a genuine
+clean run. Downloads are shared with the dev environment to avoid re-fetching.
+Exits 0 on pass, 1 on fail.
+
+```bash
+bash test.sh
+```
+
+`common.sh` — shared functions sourced by both scripts. Not run directly.
+
 ## How it works
 
 On first boot, `firstboot.sh` runs as a systemd oneshot service. It reads
