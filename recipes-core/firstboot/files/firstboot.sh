@@ -82,7 +82,7 @@ if [ -n "$USERNAME" ]; then
 fi
 
 # --- SSH ---------------------------------------------------------------------
-AUTHORIZED_KEYS=$(get_value ssh authorized_keys)
+AUTHORIZED_KEYS=$(sed -n "/^\[ssh\]/,/^\[/p" "$INI" | grep "^authorized_keys=" | cut -d= -f2-)
 
 if [ -n "$AUTHORIZED_KEYS" ] && [ -n "$USERNAME" ]; then
     $LOG "Installing authorized_keys for $USERNAME"
