@@ -29,8 +29,8 @@ echo "rpi-headless clean build test"
 echo "=============================="
 echo ""
 
-read -rp "Base directory [${HOME}/Development]: " BASE
-BASE="${BASE:-${HOME}/Development}"
+read -rp "Base directory [${HOME}/yocto]: " BASE
+BASE="${BASE:-${HOME}/yocto}"
 BASE="${BASE%/}"
 
 echo ""
