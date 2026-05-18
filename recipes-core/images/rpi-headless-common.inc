@@ -24,7 +24,6 @@ IMAGE_INSTALL = "\
     \
     kernel-modules \
     linux-firmware \
-    udev-rules-rpi \
     \
     coreutils \
     util-linux \
@@ -41,7 +40,6 @@ IMAGE_INSTALL = "\
     iproute2 \
     iproute2-ss \
     iproute2-tc \
-    iptables \
     iputils-ping \
     \
     openssh \
@@ -56,7 +54,6 @@ IMAGE_INSTALL = "\
     python3 \
     python3-core \
     python3-modules \
-    python3-pip \
     \
     vim \
     vim-syntax \
@@ -74,7 +71,6 @@ IMAGE_INSTALL = "\
     which \
     \
     dosfstools \
-    parted \
     \
     tzdata \
 "
