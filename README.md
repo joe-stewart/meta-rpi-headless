@@ -224,7 +224,12 @@ meta-custom/
 - `config.txt` comments are stripped at deploy time to avoid a firmware file size bug
   ([raspberrypi/firmware#1948](https://github.com/raspberrypi/firmware/issues/1948))
 
-**v1.1 candidates:** `parted`, `python3-pip`, `screen`, and `iptables` are flagged for
-removal. Dropping `parted` and `screen` has no functional impact on the headless use case.
-Removing `python3-pip` (meta-python) and `iptables` (meta-networking) may allow
-meta-openembedded to be dropped as a dependency entirely, pending verification.
+**Package placement:** Any RPi-specific package belongs in `rpi-base-image.bb` with
+`:append:rpi`, never in `rpi-headless-common.inc`. Packages in the common inc are
+included in all image builds — leaking RPi-specific packages there silently pulls in
+unintended dependencies on non-RPi targets like QEMU.
+
+**iptables:** Present as an implicit dependency of `ipv6` in `DISTRO_FEATURES`, not
+an explicit package choice. IPv6 is required because ARP resolution fails without it,
+which breaks DHCP even with a static address map. Removing iptables is not possible
+without removing IPv6 support.
