@@ -115,7 +115,7 @@ echo "Validating output..."
 IMAGE_PATH="${BUILD_DIR}/tmp-glibc/deploy/images/${MACHINE}/${IMAGE}-${MACHINE}.rootfs.rpi-sdimg"
 
 if [ -f "${IMAGE_PATH}" ]; then
-    SIZE=$(du -h "${IMAGE_PATH}" | cut -f1)
+    SIZE=$(du -h $(readlink -f "${IMAGE_PATH}") | cut -f1)
     echo ""
     echo "========================================"
     echo "PASS — image found"
