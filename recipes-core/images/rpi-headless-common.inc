@@ -20,10 +20,8 @@ IMAGE_INSTALL = "\
     \
     systemd \
     systemd-conf \
-    systemd-serialgetty \
     \
     kernel-modules \
-    linux-firmware \
     \
     coreutils \
     util-linux \
@@ -47,13 +45,10 @@ IMAGE_INSTALL = "\
     openssh-sftp-server \
     \
     glibc \
-    glibc-utils \
     libgcc \
     libstdc++ \
     \
-    python3 \
     python3-core \
-    python3-modules \
     \
     vim \
     vim-syntax \

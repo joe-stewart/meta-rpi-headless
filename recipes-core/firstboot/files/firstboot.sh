@@ -73,7 +73,7 @@ if [ -n "$USERNAME" ]; then
         $LOG "Creating user $USERNAME"
         UID_OPT=""
         [ -n "$UID_VAL" ] && UID_OPT="-u $UID_VAL"
-        useradd -m -s /bin/bash $UID_OPT -G sudo "$USERNAME"
+        useradd -m -s /bin/bash $UID_OPT -G sudo,systemd-journal "$USERNAME"
         if [ -n "$PASSWORD" ]; then
             echo "$USERNAME:$PASSWORD" | chpasswd
             $LOG "Password set for $USERNAME"

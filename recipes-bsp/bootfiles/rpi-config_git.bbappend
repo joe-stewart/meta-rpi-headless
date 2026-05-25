@@ -9,3 +9,4 @@ do_deploy:append() {
     sed -i '/^#/d' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
     sed -i '/^$/d' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
 }
+COMPATIBLE_MACHINE = "raspberrypi.*"
